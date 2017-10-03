@@ -1,0 +1,11 @@
+
+
+.container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-primary {
+    display: flex;
+    justify-content: space-between;
+}
