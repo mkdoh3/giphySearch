@@ -17,11 +17,13 @@ let gifURL;
 
 
 
+//api call to giphy base on searchQuery, limited to 10 results
 function giphyCall() {
     return $.ajax({
         url: "https://api.giphy.com/v1/gifs/search?api_key=CDrewNwfN9TWDnXhucfwDmCGcZIfoVuy&q=" + searchQuery + "&limit=10&rating=PG-13",
         method: "GET"
     }).done(function (response) {
+        //reset results array between calls. Needs to be empty in the case of a search with no results
         resultsArray = [];
         if (response.data.length > 0) {
             resultsArray = response.data;
@@ -35,12 +37,12 @@ function giphyCall() {
 }
 
 
-
+//creat new img divs based on results from api call, set attributes for the different "still" img and gif img urls for the pause play function
 function renderResults() {
     $(".results-field").empty();
     $.each(resultsArray, function (index, element) {
         let newIMG = $("<img>")
-            .addClass("gif")
+            .addClass("gif m-2")
             .attr("data-animate", element.images.fixed_height.url)
             .attr("data-still", element.images.fixed_height_still.url)
             .attr("src", element.images.fixed_height_still.url)
@@ -49,8 +51,8 @@ function renderResults() {
     })
 };
 
+//handle no results
 function ifNoResults() {
-    console.log("hi")
     $(".results-field").empty()
     $(".results-field").html("<h1>NO RESULTS</h1>")
 
@@ -59,19 +61,18 @@ function ifNoResults() {
 
 
 
+// store only the last 6 recents searches in an array to be using to render recent buttons
 function pushRecentSearches() {
-    console.log("results array inside pushrecent", resultsArray)
     if (recentSearches.indexOf(searchQuery) === -1 && searchQuery.length > 0 && resultsArray.length > 0) {
         recentSearches.unshift(searchQuery);
     }
     if (recentSearches.length === 7) {
         recentSearches.splice(6, 1)
     }
-    console.log(recentSearches)
 }
 
 
-
+//render buttons to be used as from quick search based on recent searches
 function renderRecentButton() {
 
     $(".recent").empty();
@@ -83,11 +84,9 @@ function renderRecentButton() {
     })
 };
 
-
+//change data state and src attribute of images to switch between animated and still
 function playPauseGif(imgElement) {
-    console.log(imgElement)
     let state = $(imgElement).attr("data-state");
-    console.log(state)
     if (state === "still") {
         $(imgElement).attr("src", $(imgElement).attr("data-animate"));
         $(imgElement).attr("data-state", "animate");
@@ -99,7 +98,6 @@ function playPauseGif(imgElement) {
 
 
 $(document).on("click", ".btn-primary", function () {
-    console.log($(this).text())
     searchQuery = $(this).text();
     giphyCall();
 });
